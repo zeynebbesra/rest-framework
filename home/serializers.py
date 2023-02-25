@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Person, Job
 from django.contrib.auth.models import User
 
+
 class RegisterSerializer(serializers.Serializer):
     username = serializers.CharField()
     email = serializers.EmailField()
@@ -30,6 +31,7 @@ class JobSerializer(serializers.ModelSerializer):
         fields = ['job_name']
 
 class PersonSerializer(serializers.ModelSerializer):
+    
     job = JobSerializer()   #Burada foreign key'i serileştirmiş olduk.
     job_info = serializers.SerializerMethodField()
     class Meta:

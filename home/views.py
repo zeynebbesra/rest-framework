@@ -7,8 +7,7 @@ from home.serializers import PersonSerializer, LoginSerializer, RegisterSerializ
 from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
-
-
+from django.core.paginator import Paginator
 
 class RegisterAPI(APIView):
 
@@ -28,6 +27,7 @@ class RegisterAPI(APIView):
 
 
 class LoginAPI(APIView):
+
     def post(self, request):
         data = request.data
         serializer = LoginSerializer(data = data)
@@ -50,12 +50,20 @@ class LoginAPI(APIView):
 
  
 class PersonAPI(APIView):
-
     def get(self, request):
-        objs = Person.objects.all()
-        serializer = PersonSerializer(objs, many=True)
-        return Response(serializer.data)
-    
+        try:
+            objs = Person.objects.all()
+            page = request.GET.get('page', 2)
+            page_size = 2
+            paginator = Paginator(objs, page_size)
+            serializer = PersonSerializer(paginator.page(page), many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({
+                'status' : False,
+                'message' : 'Invalid page'
+            })
+        
     def post(self, request):
         data = request.data
         serializer = PersonSerializer(data = data)
